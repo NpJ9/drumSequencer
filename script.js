@@ -4,7 +4,7 @@ const rows = [4];
 const columns = [16];
 let gridArray = Array.from({ length: rows }, () => Array(columns).fill(null)); // Initialize empty 2D array 
 let drumArray = [];
-
+let loopPlaying = false;
 function generateGrid(){
     for(let i = 0; i < rows; i++){
         for(let j = 0 ; j < columns; j++){
@@ -64,17 +64,49 @@ buttons.forEach((button, buttonIndex) => {
         console.log(gridArray); // Doesnt add the value to the original array 
     })
 });
-
+let intervalid 
 
 function playLoop(){
-    for (let j =0; j < columns; j++){
-        for (let i =0; i < rows; i++){
-            console.log(`row ${i}, Column ${j} → ${gridArray[i][j]}`);
+    let currentColumn = 0;
+    let interval = 200;
+    if(loopPlaying === true){
+        loopPlaying = false;
+        return
+    }
+ 
+    function firstColumn(){
+        if(currentColumn >= columns){
+            return;
+        }
+
+        buttons.forEach(button => button.classList.remove("highlighted"));
+
+        for (let i = 0; i < rows; i++){
+            console.log(`row ${i}, Column ${currentColumn} → ${gridArray[i][currentColumn]}`);
+            let buttonIndex = i * columns + currentColumn;  // Find buttonIndex from 2D array 
+            buttons[buttonIndex].classList.add("highlighted");
         };
-        console.log("looped through "+ j + " beat");   
-    };
+            console.log("looped through "+ currentColumn + " beat");
+            currentColumn++;   
+            loopPlaying = true;
+    }
+
+    firstColumn(); // Call immediately so as to avoid delay at end of loop
+
+    intervalid = setInterval(() => {
+        if(currentColumn >= columns){
+            clearInterval(intervalid);
+            console.log("Finished loop");
+            playLoop();
+            return;
+        }
+        firstColumn();
+
+    }, interval); // Only call interval once the first column has been proccessed
 };
 
 play.addEventListener('click', (e) =>{
+    clearInterval(intervalid);
+    currentColumn = 0;
     playLoop();
 });

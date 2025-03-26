@@ -74,3 +74,7 @@ body{
     background-color: rgb(199, 38, 38);
     transition: ease-in-out 20ms;
 }
+
+.highlighted{
+    background-color: red;
+}
